@@ -1,6 +1,5 @@
 const User = require("../models/user");
 
-// GET /users — admin only
 exports.getAllUsers = async (req, res) => {
     try {
         if (req.user.role !== "admin") {
@@ -14,7 +13,6 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
-// GET /users/:id — admin or self
 exports.getUserById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -32,7 +30,6 @@ exports.getUserById = async (req, res) => {
     }
 };
 
-// PATCH /users/:id — admin or self
 exports.updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -42,7 +39,7 @@ exports.updateUser = async (req, res) => {
         }
 
         const updateFields = req.body;
-        delete updateFields.password; // optional: prevent direct password edit
+        delete updateFields.password;
 
         const user = await User.findByIdAndUpdate(id, updateFields, {
             new: true
@@ -56,7 +53,6 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-// DELETE /users/:id — admin only
 exports.deleteUser = async (req, res) => {
     try {
         if (req.user.role !== "admin") {

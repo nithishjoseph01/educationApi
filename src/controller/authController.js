@@ -15,7 +15,6 @@ exports.register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
-        // Only admin can create users
         if (req.user.role !== "admin") {
             return res.status(403).json({ message: "Forbidden: Admin only" });
         }

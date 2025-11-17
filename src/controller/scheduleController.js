@@ -1,6 +1,5 @@
 const Schedule = require("../models/schedule");
 
-// CREATE schedule — Staff only
 exports.createSchedule = async (req, res) => {
   try {
     if (req.user.role !== "staff") {
@@ -20,7 +19,6 @@ exports.createSchedule = async (req, res) => {
   }
 };
 
-// GET schedules (admin, staff, student)
 exports.getSchedules = async (req, res) => {
   try {
     const {
@@ -40,14 +38,12 @@ exports.getSchedules = async (req, res) => {
     if (semesterNo) filter.semesterNo = Number(semesterNo);
     if (batch) filter.batch = batch;
 
-    // Date range
     if (from || to) {
       filter.startAt = {};
       if (from) filter.startAt.$gte = new Date(from);
       if (to) filter.startAt.$lte = new Date(to);
     }
 
-    // Search
     if (s) {
       filter.$or = [
         { title: { $regex: s, $options: "i" } },
@@ -55,12 +51,10 @@ exports.getSchedules = async (req, res) => {
       ];
     }
 
-    // Student restrictions
     if (req.user.role === "student") {
       filter.attendees = req.user._id;
     }
 
-    // Pagination
     const skip = (page - 1) * limit;
 
     const schedules = await Schedule.find(filter)
@@ -83,15 +77,12 @@ exports.getSchedules = async (req, res) => {
 };
 
 
-
-// GET single schedule
 exports.getScheduleById = async (req, res) => {
   try {
     const schedule = await Schedule.findById(req.params.id);
 
     if (!schedule) return res.status(404).json({ message: "Not found" });
 
-    // Student must be an attendee
     if (req.user.role === "student" && !schedule.attendees.includes(req.user._id)) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -102,8 +93,6 @@ exports.getScheduleById = async (req, res) => {
   }
 };
 
-
-// UPDATE — staff who created it OR admin
 exports.updateSchedule = async (req, res) => {
   try {
     const schedule = await Schedule.findById(req.params.id);
@@ -129,8 +118,6 @@ exports.updateSchedule = async (req, res) => {
   }
 };
 
-
-// DELETE — staff who created it OR admin
 exports.deleteSchedule = async (req, res) => {
   try {
     const schedule = await Schedule.findById(req.params.id);
